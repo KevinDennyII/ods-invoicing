@@ -32,17 +32,20 @@ Stripe-hosted payment pages.
 
 ## Tech stack
 
-| Layer | Choice |
-| --- | --- |
-| Invoicing core | Invoice Ninja (Debian Docker image) + MySQL 8 + Redis |
-| Admin UI | Invoice Ninja web app behind nginx |
-| Client portal | React 18 + Vite + React Router |
-| Portal hosting | Netlify (static SPA); `/api` proxied to the BFF |
-| BFF | Node.js + Express, Redis sessions, magic-link auth, CSRF, rate limits |
-| Payments | Stripe via Invoice Ninja (card + ACH); payouts to Novo |
-| Ingress to Docker | Cloudflare Tunnel (`cloudflared` in Compose — no published host ports) |
-| Secrets | Self-hosted Infisical (`https://secrets.thatdeveloper.dev`) |
-| Ops | `./scripts/ods` wraps `infisical run` + `docker compose` |
+Built around Invoice Ninja, then layered with a modern client experience and zero-trust
+ops — no open ports, no secrets on disk.
+
+- 🥷 **Invoice Ninja** — system of record: clients, invoices, recurring schedules, PDFs
+- 🗄️ **MySQL 8 + Redis** — Invoice Ninja data + BFF sessions / queues
+- 🎛️ **nginx** — reverse proxy in front of Invoice Ninja (and local portal-edge)
+- ⚛️ **React 18 · Vite · React Router** — branded client portal
+- 🟩 **Netlify** — hosts the portal SPA; proxies `/api` to the BFF
+- 🟢 **Node · Express BFF** — magic-link auth, CSRF, rate limits, client-scoped API
+- 💳 **Stripe** — card + ACH via Invoice Ninja; payouts land in Novo
+- ☁️ **Cloudflare** — DNS + Tunnel ingress (see below)
+- 🔐 **Infisical** — runtime secrets (see below)
+- 🐳 **Docker Compose** — one stack on the Mac today, same stack on a VPS later
+- 🛠️ **`./scripts/ods`** — `infisical run` + compose: check, up, logs, backup
 
 ## Architecture
 
@@ -61,50 +64,26 @@ Stripe-hosted payment pages.
                                    NINJA_API_TOKEN (server only)
 ```
 
-**Today:** Docker runs on this Mac (laptop must be awake for API/admin).  
-**Later:** Same Compose stack on an always-on VPS; Netlify and DNS stay put
+**Today:** Docker on this Mac (must be awake for API/admin).  
+**Later:** Same Compose on an always-on VPS; Netlify stays
 ([docs/vps-migration.md](docs/vps-migration.md)).
 
-### Cookie / API shape
-
-The portal calls `fetch('/api…', { credentials: 'same-origin' })`. Netlify rewrites `/api/*`
-to `https://api.pay.ohhdennyservices.com` so session and CSRF cookies stay on
-`pay.ohhdennyservices.com`.
+The portal uses same-origin `/api` calls. Netlify rewrites those to `api.pay` so session and
+CSRF cookies stay on `pay.ohhdennyservices.com`.
 
 ## Cloudflare
 
-- DNS for `ohhdennyservices.com` is at Cloudflare (registrar can stay Namecheap).
-- **Tunnel** exposes only Docker services that need the public internet:
-  - `api.pay` → `bff:8080`
-  - `admin.pay` → `ninja-nginx:80`
-- After Netlify cutover, **`pay` is not on the tunnel** — it is a Netlify custom domain.
-- The connector must run **inside Docker** on the same network as `bff` / `ninja-nginx`.
-  A macOS `cloudflared` service cannot resolve those names and will 502. See
-  [docs/hosting-and-tunnels.md](docs/hosting-and-tunnels.md).
-- Prefer Cloudflare Access on `admin.pay` (your email only). Leave `pay` and `api.pay`
-  reachable for clients; the portal has its own magic-link auth.
+DNS for the zone lives at Cloudflare. A **Tunnel** (connector in Docker Compose) publishes
+only `api.pay` → BFF and `admin.pay` → Invoice Ninja — no host ports open. The client
+portal on `pay` is Netlify, not the tunnel. Details:
+[hosting-and-tunnels.md](docs/hosting-and-tunnels.md).
 
-## Infisical (secrets)
+## Infisical
 
-Secrets never live in committed `.env` files. They live in Infisical:
-
-- Domain: `https://secrets.thatdeveloper.dev`
-- Project path: `/ods-invoicing` (env `dev` for local)
-- Repo marker: [`.infisical.json`](.infisical.json) (project id + domain only — safe to commit)
-
-Every ops command injects secrets at runtime:
-
-```bash
-INFISICAL_DOMAIN=https://secrets.thatdeveloper.dev \
-  infisical run --env=dev --path=/ods-invoicing -- <command>
-```
-
-`./scripts/ods` does that for you. Key names (empty values) are listed in
-[`.env.example`](.env.example). Bootstrap a one-time upload file with
-`./scripts/make-upload-env`, import into Infisical, then delete the file
-(`.env.infisical-upload` is gitignored).
-
-Do **not** run `infisical export` into a project `.env`.
+All secrets live in self-hosted Infisical at
+[secrets.thatdeveloper.dev](https://secrets.thatdeveloper.dev) under `/ods-invoicing`.
+`./scripts/ods` injects them at runtime via `infisical run` — nothing sensitive is committed.
+Key names: [`.env.example`](.env.example). Bootstrap: `./scripts/make-upload-env`.
 
 ## Quick start (Mac backend)
 
@@ -145,16 +124,14 @@ scripts/make-upload-env One-time Infisical import helper
 
 ## Docs
 
-| Doc | Topic |
-| --- | --- |
-| [chunk-1-first-boot.md](docs/chunk-1-first-boot.md) | Secrets + first Docker boot |
-| [chunk-2-api-hostname.md](docs/chunk-2-api-hostname.md) | `api.pay` tunnel route |
-| [netlify-portal.md](docs/netlify-portal.md) | Deploy portal + DNS cutover |
-| [invoice-ninja-setup.md](docs/invoice-ninja-setup.md) | Logo, colors, Stripe, hardening |
-| [novo-migration.md](docs/novo-migration.md) | Move recurring clients off Novo |
-| [vps-migration.md](docs/vps-migration.md) | Move Docker off the Mac later |
-| [dns-replit-coexistence.md](docs/dns-replit-coexistence.md) | DNS ownership vs Replit / mail |
-| [hosting-and-tunnels.md](docs/hosting-and-tunnels.md) | Netlify + tunnel rules |
+- 🚀 [chunk-1-first-boot.md](docs/chunk-1-first-boot.md) — secrets + first Docker boot
+- 🔌 [chunk-2-api-hostname.md](docs/chunk-2-api-hostname.md) — `api.pay` tunnel route
+- 🟩 [netlify-portal.md](docs/netlify-portal.md) — deploy portal + DNS cutover
+- 🎨 [invoice-ninja-setup.md](docs/invoice-ninja-setup.md) — logo, colors, Stripe, hardening
+- 📦 [novo-migration.md](docs/novo-migration.md) — move recurring clients off Novo
+- 🖥️ [vps-migration.md](docs/vps-migration.md) — move Docker off the Mac later
+- 🌐 [dns-replit-coexistence.md](docs/dns-replit-coexistence.md) — DNS vs Replit / mail
+- ☁️ [hosting-and-tunnels.md](docs/hosting-and-tunnels.md) — Netlify + tunnel rules
 
 ## Security posture
 
