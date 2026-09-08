@@ -1,0 +1,10 @@
+.sign-in {
+  display: grid;
+  place-items: center;
+  min-height: 60vh;
+}
+
+.sign-in__card {
+  width: min(100%, 28rem);
+  padding: var(--space-8);
+}

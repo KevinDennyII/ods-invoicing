@@ -1,0 +1,53 @@
+/* Brand and layout primitives. Everything else composes from these. */
+:root {
+  --ods-blue: #3b5998;
+  --ods-blue-deep: #2c4275;
+  --ods-blue-tint: #eef2fa;
+  --ods-charcoal: #58595b;
+  --ods-ink: #1d1f24;
+  --ods-paper: #ffffff;
+  --ods-canvas: #f6f7fb;
+  --ods-line: #dfe3ec;
+
+  --status-paid: #1f7a4d;
+  --status-paid-bg: #e6f4ec;
+  --status-due: #8a5a00;
+  --status-due-bg: #fdf2dc;
+  --status-overdue: #a12525;
+  --status-overdue-bg: #fbeaea;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 1px 2px rgb(29 31 36 / 6%), 0 8px 24px rgb(29 31 36 / 6%);
+  --shadow-lift: 0 2px 4px rgb(29 31 36 / 8%), 0 16px 32px rgb(29 31 36 / 10%);
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --measure: 68ch;
+  --shell-width: 56rem;
+
+  /* Motion is a variable so reduced-motion can zero it out in one place. */
+  --motion-fast: 140ms;
+  --motion-base: 260ms;
+  --motion-slow: 520ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 1ms;
+    --motion-base: 1ms;
+    --motion-slow: 1ms;
+  }
+}

@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+# One-time secret bundle produced by scripts/make-upload-env
+.env.infisical-upload
+backups/
+*.pem
+*.key
+credentials.json
+**/cloudflared-credentials.json
+.DS_Store
+node_modules/
+dist/
+.turbo/
+*.log

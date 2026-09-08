@@ -1,0 +1,11 @@
+.logo {
+  display: block;
+  height: auto;
+  width: 11rem;
+  /* The supplied artwork is on white; blending keeps it clean on tinted surfaces. */
+  mix-blend-mode: multiply;
+}
+
+.logo--lg {
+  width: 15rem;
+}

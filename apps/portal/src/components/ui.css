@@ -1,0 +1,159 @@
+/* Buttons -------------------------------------------------------------- */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.9rem;
+  padding: 0 var(--space-6);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background: var(--ods-blue);
+  color: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--ods-blue-deep);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.button--primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button--secondary {
+  background: var(--ods-paper);
+  color: var(--ods-blue);
+  border-color: var(--ods-line);
+}
+
+.button--secondary:hover:not(:disabled) {
+  border-color: var(--ods-blue);
+}
+
+.button--quiet {
+  background: none;
+  color: var(--ods-charcoal);
+  padding-inline: var(--space-2);
+  min-height: 2.25rem;
+}
+
+.button--block {
+  width: 100%;
+}
+
+/* Cards ---------------------------------------------------------------- */
+.card {
+  background: var(--ods-paper);
+  border: 1px solid var(--ods-line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+
+/* Status ---------------------------------------------------------------- */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.2rem var(--space-3);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status--paid { color: var(--status-paid); background: var(--status-paid-bg); }
+.status--sent,
+.status--partial { color: var(--status-due); background: var(--status-due-bg); }
+.status--overdue { color: var(--status-overdue); background: var(--status-overdue-bg); }
+.status--cancelled { color: var(--ods-charcoal); background: var(--ods-canvas); }
+
+/* Forms ----------------------------------------------------------------- */
+.field {
+  display: block;
+}
+
+.field__label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-block-end: var(--space-2);
+}
+
+.field__hint {
+  color: var(--ods-charcoal);
+  font-size: 0.88rem;
+  margin-block-start: var(--space-2);
+}
+
+.input {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--ods-line);
+  border-radius: var(--radius-md);
+  font: inherit;
+  background: var(--ods-paper);
+  transition: border-color var(--motion-fast) var(--ease-out);
+}
+
+.input:hover {
+  border-color: var(--ods-charcoal);
+}
+
+/* Feedback -------------------------------------------------------------- */
+.notice {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 0.94rem;
+}
+
+.notice--error {
+  color: var(--status-overdue);
+  background: var(--status-overdue-bg);
+}
+
+.notice--info {
+  color: var(--ods-blue-deep);
+  background: var(--ods-blue-tint);
+}
+
+.muted {
+  color: var(--ods-charcoal);
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+  color: var(--ods-charcoal);
+}

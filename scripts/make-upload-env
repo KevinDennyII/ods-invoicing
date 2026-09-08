@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Writes .env.infisical-upload: a one-time file to drag into Infisical
+# (project ods-invoicing, env dev, path /ods-invoicing), then delete.
+#
+# Generated values are created here because they must be new and random.
+# Everything you must paste yourself is left blank and labelled PASTE.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+OUT=".env.infisical-upload"
+
+if [ -f "$OUT" ]; then
+  echo "$OUT already exists. Delete it first so we never reuse an old key." >&2
+  exit 1
+fi
+
+echo "Generating APP_KEY from the Invoice Ninja image..."
+APP_KEY="$(docker run --rm invoiceninja/invoiceninja-debian:latest php artisan key:generate --show 2>/dev/null | tail -1)"
+if [ -z "$APP_KEY" ]; then
+  echo "Could not generate APP_KEY (is Docker Desktop running?)" >&2
+  exit 1
+fi
+
+umask 077
+cat > "$OUT" <<EOF
+# ODS Invoicing secrets -> Infisical, env "dev", path "/ods-invoicing"
+# Generated $(date -u +"%Y-%m-%dT%H:%M:%SZ"). Upload, then DELETE this file.
+
+# ---------------------------------------------------------------- generated
+APP_KEY=$APP_KEY
+BFF_SESSION_SECRET=$(openssl rand -base64 48 | tr -d '\n')
+DB_PASSWORD=$(openssl rand -base64 24 | tr -d '\n/+=' | cut -c1-28)
+DB_ROOT_PASSWORD=$(openssl rand -base64 24 | tr -d '\n/+=' | cut -c1-28)
+
+# ---------------------------------------------------- paste before first run
+# Zero Trust > Networks > Tunnels > ods-invoicing-local > Configure > token
+CLOUDFLARE_TUNNEL_TOKEN=PASTE_TUNNEL_TOKEN
+
+# Invoice Ninja > Settings > Account Management > API Tokens (create AFTER first boot)
+# Leave as pending so ./scripts/ods up can start before the token exists.
+NINJA_API_TOKEN=pending
+
+# First boot only. Delete both keys from Infisical once the admin user exists.
+IN_USER_EMAIL=PASTE_YOUR_ADMIN_EMAIL
+IN_PASSWORD=PASTE_A_STRONG_PASSWORD
+
+# ---------------------------------------------------------- outbound mail
+# Postmark: host smtp.postmarkapp.com, port 587, username/password = server token
+MAIL_MAILER=smtp
+MAIL_HOST=PASTE_SMTP_HOST
+MAIL_PORT=587
+MAIL_USERNAME=PASTE_SMTP_USERNAME
+MAIL_PASSWORD=PASTE_SMTP_PASSWORD
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=billing@ohhdennyservices.com
+MAIL_FROM_NAME=OhhDenny Services
+
+# ------------------------------------------------------------ non-secret config
+APP_URL=https://admin.pay.ohhdennyservices.com
+APP_ENV=production
+APP_DEBUG=false
+REQUIRE_HTTPS=true
+SESSION_SECURE_COOKIE=true
+TRUSTED_PROXIES=*
+DB_DATABASE=ninja
+DB_USERNAME=ninja
+PORTAL_ORIGIN=https://pay.ohhdennyservices.com
+EOF
+
+echo
+echo "Wrote $OUT (chmod 600, git-ignored)."
+echo "1. Replace every PASTE_ placeholder."
+echo "2. Infisical > ods-invoicing > env dev > path /ods-invoicing > Import/Drag .env"
+echo "3. rm $OUT"
+echo
+echo "Remaining PASTE_ placeholders:"
+grep -c 'PASTE_' "$OUT"

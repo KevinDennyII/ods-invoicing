@@ -1,0 +1,65 @@
+.autopay__panel {
+  max-width: 34rem;
+}
+
+.autopay__state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.autopay__dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: var(--ods-line);
+  transition: background-color var(--motion-base) var(--ease-out);
+}
+
+.autopay__dot.is-on {
+  background: var(--status-paid);
+}
+
+/* One short pulse when autopay is switched on: confirmation, not decoration. */
+.autopay__dot.is-celebrating {
+  animation: autopay-pulse var(--motion-slow) var(--ease-spring);
+}
+
+@keyframes autopay-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(31 122 77 / 45%);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgb(31 122 77 / 0%);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(31 122 77 / 0%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .autopay__dot.is-celebrating {
+    animation: none;
+  }
+}
+
+.autopay__methods {
+  margin: 0;
+  padding-left: var(--space-6);
+}
+
+.autopay__schedules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.autopay__schedule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+}

@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+# Single entry point for the stack. Every command runs through Infisical so no
+# secret ever lands in a file on disk or in shell history.
+#
+#   ./scripts/ods up            start everything
+#   ./scripts/ods tunnel        start only the Cloudflare connector
+#   ./scripts/ods down          stop everything
+#   ./scripts/ods logs [svc]    follow logs
+#   ./scripts/ods check         verify boot secrets (and report missing portal token)
+#   ./scripts/ods appkey        print a fresh APP_KEY to paste into Infisical
+#   ./scripts/ods sessionkey    print a fresh BFF session secret
+#   ./scripts/ods backup        dump MySQL + storage to ./backups
+#
+# Boot can succeed without NINJA_API_TOKEN (use pending). Create the token after first admin login.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+export INFISICAL_DOMAIN="${INFISICAL_DOMAIN:-https://secrets.thatdeveloper.dev}"
+INFISICAL_ARGS=(--env="${ODS_ENV:-dev}" --path=/ods-invoicing)
+
+# First boot: Invoice Ninja + tunnel can start without the portal API token.
+BOOT_SECRETS=(
+  CLOUDFLARE_TUNNEL_TOKEN
+  APP_KEY
+  DB_PASSWORD
+  DB_ROOT_PASSWORD
+  BFF_SESSION_SECRET
+)
+
+# Portal API: create in Invoice Ninja after admin exists, then store in Infisical.
+PORTAL_SECRETS=(
+  NINJA_API_TOKEN
+)
+
+die() { echo "error: $*" >&2; exit 1; }
+
+require_tools() {
+  command -v infisical >/dev/null || die "infisical CLI not found (brew install infisical)"
+  command -v docker >/dev/null || die "docker not found"
+  docker info >/dev/null 2>&1 || die "Docker Desktop is not running"
+}
+
+# Reports only which names are set, never their values.
+# Usage: check_secrets BOOT_SECRETS | PORTAL_SECRETS | all
+check_secrets() {
+  local mode="${1:-all}"
+  local names=()
+  case "$mode" in
+    boot) names=("${BOOT_SECRETS[@]}") ;;
+    portal) names=("${PORTAL_SECRETS[@]}") ;;
+    all) names=("${BOOT_SECRETS[@]}" "${PORTAL_SECRETS[@]}") ;;
+    *) die "check_secrets: unknown mode $mode" ;;
+  esac
+
+  local script='missing=""; for name in '"${names[*]}"'; do
+    eval "value=\${$name:-}"
+    if [ -z "$value" ] || [ "$value" = "pending" ]; then missing="$missing $name"; fi
+  done
+  if [ -n "$missing" ]; then echo "MISSING:$missing"; else echo "OK"; fi'
+
+  infisical run "${INFISICAL_ARGS[@]}" -- sh -c "$script"
+}
+
+run_compose() {
+  infisical run "${INFISICAL_ARGS[@]}" -- docker compose "$@"
+}
+
+cmd="${1:-up}"
+shift || true
+
+case "$cmd" in
+  check)
+    require_tools
+    boot="$(check_secrets boot)"
+    portal="$(check_secrets portal)"
+    if [ "$boot" = "OK" ] && [ "$portal" = "OK" ]; then
+      echo "All required secrets are present in Infisical /ods-invoicing."
+      exit 0
+    fi
+    [ "$boot" = "OK" ] || echo "Boot secrets: $boot"
+    [ "$portal" = "OK" ] || echo "Portal secrets (after first admin boot): $portal"
+    echo "Add missing keys at ${INFISICAL_DOMAIN} (path /ods-invoicing)."
+    [ "$boot" = "OK" ] || exit 1
+    exit 0
+    ;;
+
+  up)
+    require_tools
+    [ "$(check_secrets boot)" = "OK" ] || die "missing boot secrets - run './scripts/ods check'"
+    if [ "$(check_secrets portal)" != "OK" ]; then
+      echo "Note: NINJA_API_TOKEN not set yet. Admin UI will work; portal API waits until you create a token."
+    fi
+    run_compose up -d --build "$@"
+    run_compose ps
+    ;;
+
+  tunnel)
+    require_tools
+    run_compose up -d cloudflared
+    run_compose ps cloudflared
+    echo "Confirm 'Healthy' in Zero Trust > Networks > Tunnels > ods-invoicing-local."
+    ;;
+
+  down)
+    require_tools
+    run_compose down "$@"
+    ;;
+
+  logs)
+    require_tools
+    run_compose logs -f --tail=100 "$@"
+    ;;
+
+  appkey)
+    require_tools
+    docker run --rm invoiceninja/invoiceninja-debian:latest php artisan key:generate --show
+    echo "Store this as APP_KEY in Infisical. Losing it makes encrypted data unreadable."
+    ;;
+
+  sessionkey)
+    openssl rand -base64 48
+    echo "Store this as BFF_SESSION_SECRET in Infisical." >&2
+    ;;
+
+  backup)
+    require_tools
+    mkdir -p backups
+    stamp="$(date +%Y%m%d-%H%M%S)"
+    infisical run "${INFISICAL_ARGS[@]}" -- sh -c \
+      'docker compose exec -T mysql mysqldump -u root -p"$DB_ROOT_PASSWORD" --single-transaction "${DB_DATABASE:-ninja}"' \
+      > "backups/ninja-${stamp}.sql"
+    docker run --rm -v ods-invoicing_app_storage:/data -v "$PWD/backups:/backup" alpine \
+      tar czf "/backup/storage-${stamp}.tar.gz" -C /data .
+    echo "Wrote backups/ninja-${stamp}.sql and backups/storage-${stamp}.tar.gz"
+    ;;
+
+  *)
+    die "unknown command: $cmd"
+    ;;
+esac

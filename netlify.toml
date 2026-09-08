@@ -1,0 +1,26 @@
+# Client portal only. Invoice Ninja + BFF stay on Docker (Mac now, VPS later).
+#
+# Netlify site settings:
+#   Base directory: (repo root — this file)
+#   Or set base to apps/portal and move redirects there; this root config is preferred.
+
+[build]
+  base = "apps/portal"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+# Same-origin /api so session + CSRF cookies stay on pay.ohhdennyservices.com.
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.pay.ohhdennyservices.com/api/:splat"
+  status = 200
+  force = true
+
+# SPA fallback (must be after /api).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "20"

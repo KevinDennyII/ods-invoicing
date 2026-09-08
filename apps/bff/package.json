@@ -1,0 +1,27 @@
+{
+  "name": "@ods/invoicing-bff",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend-for-frontend for the ODS client portal. Holds the Invoice Ninja API token so the browser never does.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "connect-redis": "^7.1.1",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "express-session": "^1.18.0",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.4.1",
+    "nodemailer": "^6.9.14",
+    "pino": "^9.3.2",
+    "pino-http": "^10.2.0"
+  }
+}
