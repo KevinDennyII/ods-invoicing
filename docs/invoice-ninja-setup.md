@@ -10,7 +10,7 @@ Settings → Company Details:
 
 - Logo: upload `branding/ods-logo.jpg`.
 - Name: OhhDenny Services · Website: `https://ohhdennyservices.com`.
-- Billing email: `billing@ohhdennyservices.com`.
+- Billing email: `ohhdennyservicesllc@gmail.com`.
 
 Settings → Client Portal → Customize:
 
@@ -39,9 +39,12 @@ Use restricted Stripe API keys where possible, and keep the secret key only in I
 
 ## 3. Outbound mail
 
-Set the `MAIL_*` keys in Infisical (Postmark or another authenticated relay) and keep
-`MAIL_FROM_ADDRESS=billing@ohhdennyservices.com`. Namecheap Private Email keeps handling
-inbound mail; only sending moves.
+Set the `MAIL_*` keys in Infisical and keep
+`MAIL_FROM_ADDRESS=ohhdennyservicesllc@gmail.com` (the inbox you actually use).
+
+For outbound SMTP from Gmail: `MAIL_HOST=smtp.gmail.com`, `MAIL_PORT=587`,
+`MAIL_USERNAME=ohhdennyservicesllc@gmail.com`, and an [App Password](https://support.google.com/accounts/answer/185833)
+(not your normal Gmail password). Or use Postmark/Resend later if you outgrow Gmail limits.
 
 The BFF uses the same `MAIL_*` values to send portal sign-in links. Without them, sign-in
 links are written to the BFF log instead of being emailed.

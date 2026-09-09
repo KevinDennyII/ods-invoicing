@@ -40,7 +40,7 @@ export const config = {
     port: Number(optional('MAIL_PORT', '587')),
     user: optional('MAIL_USERNAME'),
     pass: optional('MAIL_PASSWORD'),
-    fromAddress: optional('MAIL_FROM_ADDRESS', 'billing@ohhdennyservices.com'),
+    fromAddress: optional('MAIL_FROM_ADDRESS', 'ohhdennyservicesllc@gmail.com'),
     fromName: optional('MAIL_FROM_NAME', 'OhhDenny Services'),
   },
 };

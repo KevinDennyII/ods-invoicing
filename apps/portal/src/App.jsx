@@ -27,7 +27,7 @@ export const App = () => {
           <p className="page__lede">
             We could not reach the billing service. Please try again in a few minutes. If this
             continues, email{' '}
-            <a href="mailto:billing@ohhdennyservices.com">billing@ohhdennyservices.com</a>.
+            <a href="mailto:ohhdennyservicesllc@gmail.com">ohhdennyservicesllc@gmail.com</a>.
           </p>
           <p className="notice notice--info">
             The sign-in page still loads from our CDN; only live invoice data needs the billing

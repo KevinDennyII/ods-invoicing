@@ -45,14 +45,14 @@ IN_USER_EMAIL=PASTE_YOUR_ADMIN_EMAIL
 IN_PASSWORD=PASTE_A_STRONG_PASSWORD
 
 # ---------------------------------------------------------- outbound mail
-# Postmark: host smtp.postmarkapp.com, port 587, username/password = server token
+# Outbound via Gmail SMTP (App Password) or another relay — see docs/invoice-ninja-setup.md
 MAIL_MAILER=smtp
-MAIL_HOST=PASTE_SMTP_HOST
+MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=PASTE_SMTP_USERNAME
-MAIL_PASSWORD=PASTE_SMTP_PASSWORD
+MAIL_USERNAME=ohhdennyservicesllc@gmail.com
+MAIL_PASSWORD=PASTE_GMAIL_APP_PASSWORD
 MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=billing@ohhdennyservices.com
+MAIL_FROM_ADDRESS=ohhdennyservicesllc@gmail.com
 MAIL_FROM_NAME=OhhDenny Services
 
 # ------------------------------------------------------------ non-secret config

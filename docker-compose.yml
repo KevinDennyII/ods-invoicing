@@ -63,7 +63,7 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
       MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
-      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-billing@ohhdennyservices.com}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-ohhdennyservicesllc@gmail.com}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-OhhDenny Services}
     volumes:
       - app_public:/var/www/html/public
@@ -154,7 +154,7 @@ services:
       MAIL_PORT: ${MAIL_PORT:-587}
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
-      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-billing@ohhdennyservices.com}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-ohhdennyservicesllc@gmail.com}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME:-OhhDenny Services}
     depends_on:
       redis:
