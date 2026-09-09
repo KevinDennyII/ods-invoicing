@@ -1,5 +1,6 @@
 {
-    "workspaceId": "16a3a1be-d92e-4d53-b208-8e19dc9637f1",
-    "defaultEnvironment": "",
-    "gitBranchToEnvironmentMapping": null
+  "workspaceId": "16a3a1be-d92e-4d53-b208-8e19dc9637f1",
+  "defaultEnvironment": "dev",
+  "domain": "https://secrets.thatdeveloper.dev",
+  "gitBranchToEnvironmentMapping": null
 }
