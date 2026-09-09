@@ -1,6 +1,9 @@
 # Chunk 1 — Secrets and first boot
 
-## Infisical (path `/ods-invoicing`, env `dev`)
+## Infisical (path `/`, env `dev`)
+
+Secrets live at the **project root** in Infisical (Invoice Ninja ODS → Development), not in
+a subfolder. `./scripts/ods` uses `--path=/`.
 
 Generate a bundle (optional):
 
@@ -16,7 +19,7 @@ Generate a bundle (optional):
 | `BFF_SESSION_SECRET` | `./scripts/ods sessionkey` |
 | `DB_PASSWORD` / `DB_ROOT_PASSWORD` | random (`openssl rand -base64 24`) |
 | `DB_DATABASE` / `DB_USERNAME` | `ninja` / `ninja` |
-| `APP_URL` | `https://admin.pay.ohhdennyservices.com` |
+| `APP_URL` | `https://admin-pay.ohhdennyservices.com` |
 | `APP_ENV` / `APP_DEBUG` / `REQUIRE_HTTPS` / `SESSION_SECURE_COOKIE` | `production` / `false` / `true` / `true` |
 | `TRUSTED_PROXIES` | `*` |
 | `PORTAL_ORIGIN` | `https://pay.ohhdennyservices.com` |
@@ -37,7 +40,7 @@ uninstall it so it does not steal traffic: `sudo cloudflared service uninstall`.
 ./scripts/ods up
 ```
 
-1. Open `https://admin.pay.ohhdennyservices.com` and sign in with `IN_USER_*`.
+1. Open `https://admin-pay.ohhdennyservices.com` and sign in with `IN_USER_*`.
 2. Delete `IN_USER_EMAIL` and `IN_PASSWORD` from Infisical; restart: `./scripts/ods up`.
 3. Settings → Account Management → API Tokens → create `ods-portal-bff`.
 4. Store the token as `NINJA_API_TOKEN` in Infisical; `./scripts/ods up` again.

@@ -2,11 +2,11 @@
 #
 # Secrets are injected at runtime from Infisical; nothing sensitive lives on disk:
 #   INFISICAL_DOMAIN=https://secrets.thatdeveloper.dev \
-#   infisical run --env=dev --path=/ods-invoicing -- docker compose up -d
+#   infisical run --env=dev --path=/ -- docker compose up -d
 #
 # Cloudflare Tunnel routes (must match Docker DNS names on ods_net):
-#   api.pay.ohhdennyservices.com    -> bff:8080          (Netlify proxies /api here)
-#   admin.pay.ohhdennyservices.com  -> ninja-nginx:80
+#   api-pay.ohhdennyservices.com    -> bff:8080          (Netlify proxies /api here)
+#   admin-pay.ohhdennyservices.com  -> ninja-nginx:80
 #   pay.ohhdennyservices.com        -> Netlify (SPA); optional local: portal-edge:80
 #
 # No host ports are published: all inbound traffic arrives through cloudflared.
@@ -30,8 +30,8 @@ services:
     container_name: ods-ninja-app
     restart: unless-stopped
     environment:
-      APP_URL: ${APP_URL:-https://admin.pay.ohhdennyservices.com}
-      APP_KEY: ${APP_KEY:?APP_KEY missing - set it in Infisical /ods-invoicing}
+      APP_URL: ${APP_URL:-https://admin-pay.ohhdennyservices.com}
+      APP_KEY: ${APP_KEY:?APP_KEY missing - set it in Infisical}
       APP_ENV: ${APP_ENV:-production}
       APP_DEBUG: ${APP_DEBUG:-false}
       REQUIRE_HTTPS: ${REQUIRE_HTTPS:-true}
@@ -53,7 +53,7 @@ services:
       DB_PORT: "3306"
       DB_DATABASE: ${DB_DATABASE:-ninja}
       DB_USERNAME: ${DB_USERNAME:-ninja}
-      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD missing - set it in Infisical /ods-invoicing}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD missing - set it in Infisical}
       # Only needed for the very first boot; remove from Infisical afterwards.
       IN_USER_EMAIL: ${IN_USER_EMAIL:-}
       IN_PASSWORD: ${IN_PASSWORD:-}
@@ -145,7 +145,7 @@ services:
       PORT: "8080"
       PORTAL_ORIGIN: ${PORTAL_ORIGIN:-https://pay.ohhdennyservices.com}
       NINJA_BASE_URL: ${NINJA_INTERNAL_URL:-http://ninja-nginx}
-      NINJA_PUBLIC_URL: ${APP_URL:-https://admin.pay.ohhdennyservices.com}
+      NINJA_PUBLIC_URL: ${APP_URL:-https://admin-pay.ohhdennyservices.com}
       # Set after first admin boot. Until then use "pending" so the container can start.
       NINJA_API_TOKEN: ${NINJA_API_TOKEN:-pending}
       SESSION_SECRET: ${BFF_SESSION_SECRET:?BFF_SESSION_SECRET missing - generate one and store it in Infisical}

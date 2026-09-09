@@ -19,7 +19,7 @@ export const config = {
     // Internal address (Docker network) for API calls.
     baseUrl: optional('NINJA_BASE_URL', 'http://ninja-nginx').replace(/\/$/, ''),
     // Public address used when handing a client off to Invoice Ninja's payment pages.
-    publicUrl: optional('NINJA_PUBLIC_URL', 'https://admin.pay.ohhdennyservices.com').replace(/\/$/, ''),
+    publicUrl: optional('NINJA_PUBLIC_URL', 'https://admin-pay.ohhdennyservices.com').replace(/\/$/, ''),
     // "pending" until the admin creates an API token after first boot.
     apiToken: optional('NINJA_API_TOKEN', 'pending'),
   },

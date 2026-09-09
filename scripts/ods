@@ -17,7 +17,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 export INFISICAL_DOMAIN="${INFISICAL_DOMAIN:-https://secrets.thatdeveloper.dev}"
-INFISICAL_ARGS=(--env="${ODS_ENV:-dev}" --path=/ods-invoicing)
+INFISICAL_ARGS=(--env="${ODS_ENV:-dev}" --path=/)
 
 # First boot: Invoice Ninja + tunnel can start without the portal API token.
 BOOT_SECRETS=(
@@ -75,12 +75,12 @@ case "$cmd" in
     boot="$(check_secrets boot)"
     portal="$(check_secrets portal)"
     if [ "$boot" = "OK" ] && [ "$portal" = "OK" ]; then
-      echo "All required secrets are present in Infisical /ods-invoicing."
+      echo "All required secrets are present in Infisical (env ${ODS_ENV:-dev}, path /)."
       exit 0
     fi
     [ "$boot" = "OK" ] || echo "Boot secrets: $boot"
     [ "$portal" = "OK" ] || echo "Portal secrets (after first admin boot): $portal"
-    echo "Add missing keys at ${INFISICAL_DOMAIN} (path /ods-invoicing)."
+    echo "Add missing keys at ${INFISICAL_DOMAIN} (project root path /)."
     [ "$boot" = "OK" ] || exit 1
     exit 0
     ;;

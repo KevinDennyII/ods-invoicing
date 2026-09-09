@@ -58,9 +58,9 @@ the BFF container and is never sent to a browser. Restart: `./scripts/ods up`.
 ## 5. Hardening
 
 - `APP_DEBUG=false`, `REQUIRE_HTTPS=true`, `SESSION_SECURE_COOKIE=true` in Infisical.
-- Put `admin.pay.ohhdennyservices.com` behind Cloudflare Access (Zero Trust → Access →
+- Put `admin-pay.ohhdennyservices.com` behind Cloudflare Access (Zero Trust → Access →
   Applications → Self-hosted) restricted to your email with one-time-PIN or an IdP.
-  Leave `pay.` and `api.pay` reachable for clients (portal auth is magic-link).
+  Leave `pay.` and `api-pay` reachable for clients (portal auth is magic-link).
 - Enable two-factor authentication on your Invoice Ninja admin user.
 - No host ports are published: the only inbound path is the tunnel.
 - Back up before every image upgrade: `./scripts/ods backup`.

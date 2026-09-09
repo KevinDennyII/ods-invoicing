@@ -4,9 +4,9 @@
 
 | Surface | Host | Notes |
 | --- | --- | --- |
-| `pay.ohhdennyservices.com` | **Netlify** | Static React SPA; `/api` proxied to `api.pay` |
-| `api.pay.ohhdennyservices.com` | Docker + Cloudflare Tunnel | BFF (sessions, magic links) |
-| `admin.pay.ohhdennyservices.com` | Docker + Cloudflare Tunnel | Invoice Ninja |
+| `pay.ohhdennyservices.com` | **Netlify** | Static React SPA; `/api` proxied to `api-pay` |
+| `api-pay.ohhdennyservices.com` | Docker + Cloudflare Tunnel | BFF (sessions, magic links) |
+| `admin-pay.ohhdennyservices.com` | Docker + Cloudflare Tunnel | Invoice Ninja |
 | `ohhdennyservices.com` | Replit | Marketing — out of scope |
 | `expenses.ohhdennyservices.com` | Replit | Expenses — out of scope |
 
@@ -22,8 +22,8 @@ install the same tunnel token as a host service — Cloudflare will load-balance
 the requests will fail.
 
 ```
-api.pay.ohhdennyservices.com      -> bff:8080
-admin.pay.ohhdennyservices.com    -> ninja-nginx:80
+api-pay.ohhdennyservices.com      -> bff:8080
+admin-pay.ohhdennyservices.com    -> ninja-nginx:80
 ```
 
 After Netlify cutover, do **not** keep a public hostname for `pay` on the tunnel.
@@ -41,6 +41,6 @@ point `expenses` at the invoicing tunnel.
 
 ## Laptop sleep
 
-While Docker is on the Mac, sleep takes down `api.pay` and `admin.pay`. Netlify still
+While Docker is on the Mac, sleep takes down `api-pay` and `admin-pay`. Netlify still
 serves the static portal and shows “Billing is temporarily unavailable.” Move to a VPS
 when clients need 24/7 access.

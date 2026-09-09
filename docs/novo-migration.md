@@ -17,7 +17,7 @@ Save it as `clients.csv` outside this repo (it is customer data, not code).
 
 ## 2. Rebuild in Invoice Ninja
 
-For each client, in `https://admin.pay.ohhdennyservices.com`:
+For each client, in `https://admin-pay.ohhdennyservices.com`:
 
 1. **Clients → New Client** — name, contact email, address. The contact email is what the
    client uses to sign in at `pay.ohhdennyservices.com`, so it must match exactly.
@@ -28,7 +28,7 @@ For each client, in `https://admin.pay.ohhdennyservices.com`:
 
 Bulk alternative: the same objects can be created through `/api/v1/clients` and
 `/api/v1/recurring_invoices` with the `NINJA_API_TOKEN`, injected via
-`infisical run --env=dev --path=/ods-invoicing`. Never hardcode the token in a script.
+`infisical run --env=dev --path=/`. Never hardcode the token in a script.
 
 ## 3. Invite clients and collect payment methods
 

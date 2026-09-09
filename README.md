@@ -3,7 +3,7 @@
 Self-hosted invoicing for **OhhDenny Services, LLC**. The system of record is
 [Invoice Ninja](https://github.com/invoiceninja/invoiceninja) (clients, invoices, recurring
 schedules, Stripe autopay). A custom React portal at `pay.ohhdennyservices.com` is the
-client-facing surface. Admin work stays in Invoice Ninja at `admin.pay.ohhdennyservices.com`.
+client-facing surface. Admin work stays in Invoice Ninja at `admin-pay.ohhdennyservices.com`.
 
 Novo remains the business bank account. Stripe deposits there; Novo is no longer the
 invoicing tool.
@@ -13,8 +13,8 @@ invoicing tool.
 | Audience | URL | Purpose |
 | --- | --- | --- |
 | Clients | `https://pay.ohhdennyservices.com` | Sign in (magic link), view invoices, pay, enable autopay |
-| You (admin) | `https://admin.pay.ohhdennyservices.com` | Invoice Ninja: clients, products, Stripe, branding |
-| Portal API | `https://api.pay.ohhdennyservices.com` | BFF used by the portal (not for browsers directly) |
+| You (admin) | `https://admin-pay.ohhdennyservices.com` | Invoice Ninja: clients, products, Stripe, branding |
+| Portal API | `https://api-pay.ohhdennyservices.com` | BFF used by the portal (not for browsers directly) |
 
 Marketing (`ohhdennyservices.com`) and expenses (`expenses.ohhdennyservices.com`) stay on
 Replit and are out of scope for this repo.
@@ -54,7 +54,7 @@ ops — no open ports, no secrets on disk.
                                    |
          +-------------------------+--------------------------+
          |                         |                          |
-   pay (Netlify)            api.pay (tunnel)           admin.pay (tunnel)
+   pay (Netlify)            api-pay (tunnel)           admin-pay (tunnel)
    static React SPA              |                          |
          |                       v                          v
          |               cloudflared (Docker) -----> ninja-nginx -> Invoice Ninja
@@ -68,22 +68,25 @@ ops — no open ports, no secrets on disk.
 **Later:** Same Compose on an always-on VPS; Netlify stays
 ([docs/vps-migration.md](docs/vps-migration.md)).
 
-The portal uses same-origin `/api` calls. Netlify rewrites those to `api.pay` so session and
+The portal uses same-origin `/api` calls. Netlify rewrites those to `api-pay` so session and
 CSRF cookies stay on `pay.ohhdennyservices.com`.
 
 ## Cloudflare
 
 DNS for the zone lives at Cloudflare. A **Tunnel** (connector in Docker Compose) publishes
-only `api.pay` → BFF and `admin.pay` → Invoice Ninja — no host ports open. The client
+only `api-pay` → BFF and `admin-pay` → Invoice Ninja — no host ports open. Those are
+single-level subdomains so free Universal SSL works (`*.ohhdennyservices.com`). Nested
+names like `api.pay` are not covered without Advanced Certificate Manager. The client
 portal on `pay` is Netlify, not the tunnel. Details:
 [hosting-and-tunnels.md](docs/hosting-and-tunnels.md).
 
 ## Infisical
 
 All secrets live in self-hosted Infisical at
-[secrets.thatdeveloper.dev](https://secrets.thatdeveloper.dev) under `/ods-invoicing`.
-`./scripts/ods` injects them at runtime via `infisical run` — nothing sensitive is committed.
-Key names: [`.env.example`](.env.example). Bootstrap: `./scripts/make-upload-env`.
+[secrets.thatdeveloper.dev](https://secrets.thatdeveloper.dev) in the **Invoice Ninja ODS**
+project (path `/`, env `dev`). `./scripts/ods` injects them at runtime via `infisical run` —
+nothing sensitive is committed. Key names: [`.env.example`](.env.example). Bootstrap:
+`./scripts/make-upload-env`.
 
 ## Quick start (Mac backend)
 
@@ -111,7 +114,7 @@ VPS stopped). The Netlify page still loads.
 ## Repository layout
 
 ```
-netlify.toml            Portal build + /api proxy to api.pay
+netlify.toml            Portal build + /api proxy to api-pay
 docker-compose.yml      Invoice Ninja + MySQL + Redis + BFF + portal-edge + cloudflared
 apps/bff/               Node BFF
 apps/portal/            Vite + React (Netlify publish dir: dist)
@@ -125,7 +128,7 @@ scripts/make-upload-env One-time Infisical import helper
 ## Docs
 
 - 🚀 [chunk-1-first-boot.md](docs/chunk-1-first-boot.md) — secrets + first Docker boot
-- 🔌 [chunk-2-api-hostname.md](docs/chunk-2-api-hostname.md) — `api.pay` tunnel route
+- 🔌 [chunk-2-api-hostname.md](docs/chunk-2-api-hostname.md) — `api-pay` tunnel route
 - 🟩 [netlify-portal.md](docs/netlify-portal.md) — deploy portal + DNS cutover
 - 🎨 [invoice-ninja-setup.md](docs/invoice-ninja-setup.md) — logo, colors, Stripe, hardening
 - 📦 [novo-migration.md](docs/novo-migration.md) — move recurring clients off Novo
