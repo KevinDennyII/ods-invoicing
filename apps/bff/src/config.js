@@ -8,6 +8,13 @@ const required = (name) => {
 
 const optional = (name, fallback = '') => process.env[name] || fallback;
 
+/** Treat empty and make-upload placeholders as unset so mail falls back to log. */
+const optionalSecret = (name, fallback = '') => {
+  const value = String(process.env[name] || '').trim();
+  if (!value || value.startsWith('PASTE_')) return fallback;
+  return value;
+};
+
 export const config = {
   port: Number(optional('PORT', '8080')),
   isProduction: process.env.NODE_ENV === 'production',
@@ -36,11 +43,11 @@ export const config = {
   magicLinkTtlSeconds: 15 * 60,
 
   mail: {
-    host: optional('MAIL_HOST'),
+    host: optionalSecret('MAIL_HOST'),
     port: Number(optional('MAIL_PORT', '587')),
-    user: optional('MAIL_USERNAME'),
-    pass: optional('MAIL_PASSWORD'),
-    fromAddress: optional('MAIL_FROM_ADDRESS', 'ohhdennyservicesllc@gmail.com'),
+    user: optionalSecret('MAIL_USERNAME'),
+    pass: optionalSecret('MAIL_PASSWORD'),
+    fromAddress: optionalSecret('MAIL_FROM_ADDRESS', 'ohhdennyservicesllc@gmail.com'),
     fromName: optional('MAIL_FROM_NAME', 'OhhDenny Services'),
   },
 };

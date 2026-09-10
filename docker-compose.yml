@@ -86,6 +86,8 @@ services:
       - app_storage:/var/www/html/storage:ro
     depends_on:
       - app
+    # After `app` recreates, restart nginx once so upstream DNS is fresh
+    # (also mitigated in laravel.conf via Docker DNS resolver).
     networks:
       ods_net:
         aliases:

@@ -5,7 +5,11 @@ import { ninjaRequest } from './client.js';
 const AUTO_BILL_ON = 'always';
 const AUTO_BILL_OFF = 'off';
 
+// Invoice Ninja returns status_id as a string ("2" = Active).
 const ACTIVE_RECURRING_STATUS = 2;
+
+const isActiveRecurring = (r) =>
+  !r.is_deleted && Number(r.status_id) === ACTIVE_RECURRING_STATUS;
 
 const listRecurringForClient = (clientId) =>
   ninjaRequest(`/recurring_invoices?client_id=${clientId}&per_page=100`);
@@ -20,7 +24,7 @@ export const getAutopayStatus = async (clientId) => {
     ninjaRequest(`/clients/${clientId}?include=gateway_tokens`).then((c) => c.gateway_tokens || []),
   ]);
 
-  const active = recurring.filter((r) => !r.is_deleted && r.status_id === ACTIVE_RECURRING_STATUS);
+  const active = recurring.filter(isActiveRecurring);
 
   return {
     hasPaymentMethod: tokens.length > 0,
@@ -45,7 +49,7 @@ export const getAutopayStatus = async (clientId) => {
 /** Flips auto-bill for every active schedule the client owns. */
 export const setAutopay = async (clientId, enabled) => {
   const recurring = await listRecurringForClient(clientId);
-  const active = recurring.filter((r) => !r.is_deleted && r.status_id === ACTIVE_RECURRING_STATUS);
+  const active = recurring.filter(isActiveRecurring);
 
   await Promise.all(
     active.map((r) =>

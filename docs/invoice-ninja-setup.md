@@ -8,9 +8,19 @@ admin user exists, `NINJA_API_TOKEN` in Infisical. Logo and Stripe are this docu
 
 Settings → Company Details:
 
-- Logo: upload `branding/ods-logo.jpg`.
+- Logo: upload `branding/ods-logo.jpg` (JPG/PNG is fine).
 - Name: OhhDenny Services · Website: `https://ohhdennyservices.com`.
 - Billing email: `ohhdennyservicesllc@gmail.com`.
+
+After uploading a logo, if the preview shows a broken image:
+
+1. Confirm Infisical `APP_URL=https://admin-pay.ohhdennyservices.com` (not the old
+   `admin.pay…` name), then `./scripts/ods up`.
+2. In Invoice Ninja, company **portal domain** must match that URL (Settings or API
+   `portal_domain`). Old nested `admin.pay` links break Client Portal / Pay now.
+3. Run `./scripts/ods fix-storage` — Invoice Ninja creates company folders as mode `700`,
+   and the alpine nginx container cannot read them until directories are `755`.
+4. Hard-refresh the logo page (or remove + re-upload once).
 
 Settings → Client Portal → Customize:
 
@@ -19,9 +29,6 @@ Settings → Client Portal → Customize:
 | Primary / brand blue | `#3b5998` |
 | Hover / deep blue | `#2c4275` |
 | Body / charcoal | `#58595b` |
-
-If the logo renders broken later, it usually means `APP_URL` changed after upload. Fix
-`APP_URL`, restart, and re-upload.
 
 ## 2. Stripe with auto-bill
 
@@ -36,6 +43,22 @@ If the logo renders broken later, it usually means `APP_URL` changed after uploa
    flag for the client through the BFF.
 
 Use restricted Stripe API keys where possible, and keep the secret key only in Invoice Ninja.
+
+### Live cutover (when test autopay is proven)
+
+Stay on **test** keys until you are ready to charge real cards. Then in Invoice Ninja →
+Settings → Online Payments → Stripe:
+
+1. Replace publishable + secret keys with **live** values (`pk_live_…` / `sk_live_…`).
+2. In Stripe Dashboard (live mode), create or select a webhook endpoint aimed at the
+   Invoice Ninja URL IN shows you; subscribe to the same events IN lists.
+3. Paste the **live** signing secret into Invoice Ninja’s Webhook Secret field (not the
+   test `whsec_…`).
+4. Smoke with a real $1 invoice on a real card you control, then pause before client
+   cutover.
+
+Optional Infisical backups (`STRIPE_TEST_*` / `STRIPE_LIVE_*`) do not switch Invoice Ninja —
+the gateway UI is the source of truth.
 
 ## 3. Outbound mail
 

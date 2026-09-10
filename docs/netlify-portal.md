@@ -7,7 +7,8 @@ Docker behind `https://api-pay.ohhdennyservices.com`.
 
 - Chunk 1 done: Docker stack healthy, admin user exists, `NINJA_API_TOKEN` in Infisical.
 - Chunk 2 done: tunnel public hostname `api-pay` → `http://bff:8080` (no trailing space).
-- Infisical `PORTAL_ORIGIN=https://pay.ohhdennyservices.com`.
+- Infisical `PORTAL_ORIGIN` = custom domain once DNS exists, or the Netlify URL
+  (`https://ohhdenny-services-invoicing.netlify.app`) until `pay.` is wired.
 
 ## 1. Connect the repo
 

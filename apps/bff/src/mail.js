@@ -24,8 +24,9 @@ export const sendSignInLink = async ({ to, firstName, url }) => {
   ].join('\n');
 
   if (!transport) {
-    // Without SMTP configured we still succeed, but the link only reaches the logs.
-    logger.warn({ to }, 'SMTP not configured; sign-in link was not emailed');
+    // Without SMTP configured we still succeed; log the link so local smoke tests work.
+    // Never enable this path in a shared/multi-tenant host without SMTP.
+    logger.warn({ to, url }, 'SMTP not configured; sign-in link logged instead of emailed');
     return;
   }
 

@@ -50,6 +50,26 @@ Deliberately overlapping one cycle is fine — worst case a client sees two invo
 void one. Cancelling in Novo before the first successful Invoice Ninja cycle is what risks a
 missed month.
 
+## Long Money Concepts (first live client)
+
+Client already exists in Invoice Ninja:
+
+| Field | Value |
+| --- | --- |
+| Company | Long Money Concepts LLC (`Wpmbk5ezJn`) |
+| Contact | La'Toya Ray · `latoya@longmoneyconcepts.com` · `4439615664` |
+| Notes | Mrs. La'Toya Ray, CPA |
+
+**Do not create a live invoice or start a recurring schedule until amount, frequency, and
+next send date are confirmed** (and Stripe is on live keys if you intend a real charge).
+
+When ready:
+
+1. Confirm retainer amount + cadence with the client (or from Novo export).
+2. Create a **paused** recurring invoice (Auto Bill: Always) matching that schedule.
+3. Invite them to the portal (Netlify URL until `pay.` DNS exists).
+4. They add a payment method → you start the schedule only after live Stripe is verified.
+
 ## Cutover checklist (print or copy)
 
 For each client:

@@ -7,6 +7,7 @@
 #   ./scripts/ods down          stop everything
 #   ./scripts/ods logs [svc]    follow logs
 #   ./scripts/ods check         verify boot secrets (and report missing portal token)
+#   ./scripts/ods fix-storage   open company logo dirs so nginx can serve them
 #   ./scripts/ods appkey        print a fresh APP_KEY to paste into Infisical
 #   ./scripts/ods sessionkey    print a fresh BFF session secret
 #   ./scripts/ods backup        dump MySQL + storage to ./backups
@@ -91,8 +92,35 @@ case "$cmd" in
     if [ "$(check_secrets portal)" != "OK" ]; then
       echo "Note: NINJA_API_TOKEN not set yet. Admin UI will work; portal API waits until you create a token."
     fi
-    run_compose up -d --build "$@"
+    # --force-recreate so updated Infisical values (e.g. NINJA_API_TOKEN) replace stale env.
+    run_compose up -d --build --force-recreate "$@"
+    # Company upload dirs are created mode 700; alpine nginx cannot read them until opened.
+    # Always go through run_compose — bare `docker compose` re-parses the file and needs secrets.
+    run_compose exec -T -u root app sh -c \
+      'if [ -d /var/www/html/storage/app/public ]; then
+         chmod 755 /var/www/html/storage/app/public
+         find /var/www/html/storage/app/public -type d -exec chmod 755 {} \;
+         find /var/www/html/storage/app/public -type f -exec chmod 644 {} \;
+         echo "Opened storage/app/public for nginx (logo serving)."
+       else
+         echo "storage/app/public not ready yet — upload a logo then re-run: ./scripts/ods fix-storage"
+       fi' || true
+    # App may have a new IP after recreate; bounce nginx so FastCGI upstream is correct.
+    run_compose restart ninja-nginx
     run_compose ps
+    ;;
+
+  fix-storage)
+    require_tools
+    run_compose exec -T -u root app sh -c \
+      'if [ -d /var/www/html/storage/app/public ]; then
+         chmod 755 /var/www/html/storage/app/public
+         find /var/www/html/storage/app/public -type d -exec chmod 755 {} \;
+         find /var/www/html/storage/app/public -type f -exec chmod 644 {} \;
+         echo "Opened storage/app/public for nginx (logo serving)."
+       else
+         echo "storage/app/public not ready yet — upload a logo then re-run: ./scripts/ods fix-storage"
+       fi'
     ;;
 
   tunnel)

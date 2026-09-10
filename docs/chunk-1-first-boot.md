@@ -22,7 +22,7 @@ Generate a bundle (optional):
 | `APP_URL` | `https://admin-pay.ohhdennyservices.com` |
 | `APP_ENV` / `APP_DEBUG` / `REQUIRE_HTTPS` / `SESSION_SECURE_COOKIE` | `production` / `false` / `true` / `true` |
 | `TRUSTED_PROXIES` | `*` |
-| `PORTAL_ORIGIN` | `https://pay.ohhdennyservices.com` |
+| `PORTAL_ORIGIN` | Netlify URL until `pay.` DNS exists, then `https://pay.ohhdennyservices.com` |
 | `IN_USER_EMAIL` / `IN_PASSWORD` | first admin only — delete after first sign-in |
 | `MAIL_*` | SMTP (Postmark or Private Email) — needed for magic links |
 | `NINJA_API_TOKEN` | **after** first boot (or leave unset / `pending`) |

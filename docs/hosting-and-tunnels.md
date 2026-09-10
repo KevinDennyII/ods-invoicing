@@ -41,6 +41,16 @@ point `expenses` at the invoicing tunnel.
 
 ## Laptop sleep
 
-While Docker is on the Mac, sleep takes down `api-pay` and `admin-pay`. Netlify still
-serves the static portal and shows “Billing is temporarily unavailable.” Move to a VPS
-when clients need 24/7 access.
+While Docker is on the Mac, sleep takes down or stalls the tunnel. Netlify still
+serves the static portal and shows “Billing is temporarily unavailable.” After wake:
+
+```bash
+./scripts/ods up
+# or just: INFISICAL_DOMAIN=https://secrets.thatdeveloper.dev \
+#   infisical run --env=dev --path=/ -- docker compose restart cloudflared
+```
+
+Also uninstall any **host** `cloudflared` service for this tunnel (`sudo cloudflared service uninstall`) —
+a second connector on the Mac steals traffic and returns 502s for half the requests.
+
+Move to a VPS when clients need 24/7 access.
