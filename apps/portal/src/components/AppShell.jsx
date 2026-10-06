@@ -33,7 +33,7 @@ export const AppShell = ({ session, onSignOut, children }) => (
     <footer className="shell shell-frame__footer">
       <p className="muted">
         Questions about a charge? Email{' '}
-        <a href="mailto:ohhdennyservicesllc@gmail.com">ohhdennyservicesllc@gmail.com</a>.
+        <a href="mailto:kevin@ohhdennyservices.com">kevin@ohhdennyservices.com</a>.
       </p>
     </footer>
   </div>

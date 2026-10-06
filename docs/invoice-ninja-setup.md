@@ -10,7 +10,7 @@ Settings → Company Details:
 
 - Logo: upload `branding/ods-logo.jpg` (JPG/PNG is fine).
 - Name: OhhDenny Services · Website: `https://ohhdennyservices.com`.
-- Billing email: `ohhdennyservicesllc@gmail.com`.
+- Billing email: `kevin@ohhdennyservices.com`.
 
 After uploading a logo, if the preview shows a broken image:
 
@@ -63,11 +63,13 @@ the gateway UI is the source of truth.
 ## 3. Outbound mail
 
 Set the `MAIL_*` keys in Infisical and keep
-`MAIL_FROM_ADDRESS=ohhdennyservicesllc@gmail.com` (the inbox you actually use).
+`MAIL_FROM_ADDRESS=kevin@ohhdennyservices.com`.
 
 For outbound SMTP from Gmail: `MAIL_HOST=smtp.gmail.com`, `MAIL_PORT=587`,
-`MAIL_USERNAME=ohhdennyservicesllc@gmail.com`, and an [App Password](https://support.google.com/accounts/answer/185833)
-(not your normal Gmail password). Or use Postmark/Resend later if you outgrow Gmail limits.
+`MAIL_USERNAME` = the Gmail that owns the App Password (may still be the old
+`ohhdennyservicesllc@gmail.com` mailbox), and an [App Password](https://support.google.com/accounts/answer/185833)
+(not your normal Gmail password). If From is `kevin@…` while SMTP auth is Gmail, add
+kevin@ as a “Send mail as” address in that Gmail account. Or use Postmark/Resend later.
 
 The BFF uses the same `MAIL_*` values to send portal sign-in links. Without them, sign-in
 links are written to the BFF log instead of being emailed.
